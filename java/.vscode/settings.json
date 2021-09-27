@@ -1,0 +1,20 @@
+{
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "/home/vinicius/aux/selJava/client-combined-3.141.59.jar",
+        "/home/vinicius/aux/selJava/client-combined-3.141.59-sources.jar",
+        "/home/vinicius/aux/selJava/libs/okio-1.14.0.jar",
+        "/home/vinicius/aux/selJava/libs/okhttp-3.11.0.jar",
+        "/home/vinicius/aux/selJava/libs/guava-25.0-jre.jar",
+        "/home/vinicius/aux/selJava/libs/commons-exec-1.3.jar",
+        "/home/vinicius/aux/selJava/libs/byte-buddy-1.8.15.jar",
+        "/home/vinicius/javafx/javafx-sdk-17.0.0.1/lib/javafx.graphics.jar",
+        "/home/vinicius/javafx/javafx-sdk-17.0.0.1/lib/javafx.controls.jar",
+        "/home/vinicius/javafx/javafx-sdk-17.0.0.1/lib/javafx.web.jar",
+        "/home/vinicius/javafx/javafx-sdk-17.0.0.1/lib/javafx.base.jar",
+        "/home/vinicius/javafx/javafx-sdk-17.0.0.1/lib/javafx-swt.jar",
+        "/home/vinicius/javafx/javafx-sdk-17.0.0.1/lib/javafx.swing.jar",
+        "/home/vinicius/javafx/javafx-sdk-17.0.0.1/lib/javafx.media.jar",
+        "/home/vinicius/javafx/javafx-sdk-17.0.0.1/lib/javafx.fxml.jar"
+    ]
+}

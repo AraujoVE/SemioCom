@@ -18,6 +18,14 @@ module.exports.getDriver = async function (){
     return await new Builder().forBrowser("firefox").build();
 }
 
+module.exports.getHeadlessDriver = async function (){
+    const firefox = require('selenium-webdriver/firefox');
+    return await new Builder().forBrowser('firefox').setFirefoxOptions(new firefox.Options().headless()).build();
+}
+
+
+
+
 //Maximize current window
 module.exports.maximizeWindow = async function (driver){ //Maximize window
     await driver.manage().window().maximize();
@@ -107,11 +115,19 @@ module.exports.getElemsAttrByXPath = async function (driver,vars,waitTime=0){
     var elemAttrs = await driver.findElements(By.xpath(xPathStr))
     
     for(i = 0;i<elemAttrs.length;i++) elemAttrs[i] = await elemAttrs[i].getAttribute(attributeType);
-    
     await module.exports.wait(waitTime);
     return elemAttrs;
 }
 
+module.exports.getElemsAndAttrByXPath = async function (driver,vars,waitTime=0){
+    let xPathStr = vars[0], attributeType = vars[1];
+    var elemAttrs = await driver.findElements(By.xpath(xPathStr))
+    var elems = [];
+    for(i = 0;i<elemAttrs.length;i++) elems.push(elemAttrs[i]);
+    for(i = 0;i<elemAttrs.length;i++) elemAttrs[i] = await elemAttrs[i].getAttribute(attributeType);
+    await module.exports.wait(waitTime);
+    return [elems,elemAttrs];
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
