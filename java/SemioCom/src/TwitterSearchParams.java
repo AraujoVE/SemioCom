@@ -14,6 +14,7 @@ public class TwitterSearchParams {
         this.lang = lang;
         encodeString();
     }
+    public TwitterSearchParams(){}
     public String[] getTexts() {
         return texts;
     }
@@ -26,6 +27,19 @@ public class TwitterSearchParams {
     public String getLang() {
         return lang;
     }
+    public String encode(String s) {
+        String encodedStr = "";
+        try {
+            encodedStr = URLEncoder.encode(s, "UTF-8");
+            encodedStr = encodedStr.replaceAll("\\+", "%20");
+            encodedStr = encodedStr.replaceAll("%21", "!");
+            encodedStr = encodedStr.replaceAll("%27", "'");
+            encodedStr = encodedStr.replaceAll("%28", "(");
+            encodedStr = encodedStr.replaceAll("%29", ")");
+            encodedStr = encodedStr.replaceAll("%7E", "~");
+        } catch (UnsupportedEncodingException e) {}
+        return encodedStr;
+    }
     private void encodeString() {
         encodedStr = String.join(" ", texts) + " since:" + since + " until:" + until + " lang:" + lang;
         try {
@@ -36,8 +50,7 @@ public class TwitterSearchParams {
             encodedStr = encodedStr.replaceAll("%28", "(");
             encodedStr = encodedStr.replaceAll("%29", ")");
             encodedStr = encodedStr.replaceAll("%7E", "~");
-        } catch (UnsupportedEncodingException e) {
-        }
+        } catch (UnsupportedEncodingException e) {}
     }
     public String getEncodedStr() {
         return encodedStr;

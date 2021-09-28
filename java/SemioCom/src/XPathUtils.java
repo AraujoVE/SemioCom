@@ -14,6 +14,16 @@ public class XPathUtils {
         this.driver = driver;
     }
 
+    public void sleepS(double seconds) {
+        try {
+            Thread.sleep(Math.round(seconds * 1000));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
 
     public void click(String xpath) {
         driver.findElement(By.xpath(xpath)).click();
