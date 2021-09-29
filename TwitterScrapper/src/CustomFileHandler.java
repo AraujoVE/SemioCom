@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.List;
 
 public class CustomFileHandler {
-    private TweetsIds ti;
     
     private void createDirectory(String path){
         File directory = new File(path);
@@ -18,26 +17,6 @@ public class CustomFileHandler {
         for (String path : paths){
             createDirectory(path);
         }
-    }
-
-    public void writeTweetIds(){
-
-        String path = "./TwitterData/" + ti.getKeywordEncStr() +  "/tweetIds/" + Integer.toString(ti.getLastTweetIdCount()) + "-" + Integer.toString(ti.getLastTweetIdCount()+ti.getTweetIdsVal().size())  + ".json";
-        String content = String.join("\n", ti.getTweetIdsVal());
-        System.out.println(content);
-        System.out.println(path);
-        File file = new File(path);
-        try {
-            file.createNewFile();
-            FileWriter fw = new FileWriter(file.getAbsoluteFile());
-            BufferedWriter bw = new BufferedWriter(fw);
-            bw.write(content);
-            bw.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        ti.updateLastTweetIdCount();
-        ti.clearTweetIds();
     }
 
     public void writeFile(String path,String content){
@@ -82,11 +61,6 @@ public class CustomFileHandler {
         }
         System.out.println(lines.size());
         return lines;
-    }
-
-
-    public CustomFileHandler(TweetsIds tweetsIds){
-        ti = tweetsIds;
     }
     
     public CustomFileHandler() {
