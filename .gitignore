@@ -3,3 +3,6 @@ TwitterScrapper/.vscode
 TwitterScrapper/TwitterData
 TripAdvisorScrapper/.vscode
 TripAdvisorScrapper/TripAdvisorData
+restaurantLog.csv
+reviewsLog.csv
+__pycache__

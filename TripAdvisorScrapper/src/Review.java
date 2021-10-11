@@ -4,16 +4,18 @@ public class Review {
     int rating;
     String title;
     String review;
-    String date;
+    int date;
     int likes;
+    int visitedIn;
 
-    public Review(String username, int userReviewsNo, int rating, String title, String review, String date, int likes) {
-        this.username = username;
+    public Review(String username, int userReviewsNo, int rating, String title, String review, int date,int visitedIn, int likes) {
+        this.username = username.replace("|"," ").replaceAll("\\s+", ":.:.:.:").replace(":.:.:.:"," ").trim();
         this.userReviewsNo = userReviewsNo;
         this.rating = rating;
-        this.title = title;
-        this.review = review;
+        this.title = title.replace("|"," ").replaceAll("\\s+", ":.:.:.:").replace(":.:.:.:"," ").trim();
+        this.review = review.replace("|"," ").replaceAll("\\s+", ":.:.:.:").replace(":.:.:.:"," ").trim();
         this.date = date;
+        this.visitedIn = visitedIn;
         this.likes = likes;
     }    
 
@@ -33,7 +35,7 @@ public class Review {
     public String getReview(){
         return review;
     }
-    public String getDate(){
+    public int getDate(){
         return date;
     }
     public int getLikes(){
@@ -55,15 +57,15 @@ public class Review {
     public void setReview(String review){
         this.review = review;
     }
-    public void setDate(String date){
+    public void setDate(int date){
         this.date = date;
     }
     public void setLikes(int likes){
         this.likes = likes;
     }
 
-    public String toFileStr(){
-        return username + ":::" + userReviewsNo + ":::" + rating + ":::" + title.replaceAll("\\s+", ":.:").replace(":.:"," ") + ":::" + review.replaceAll("\\s+", ":.:").replace(":.:"," ") + ":::" + date + ":::" + likes + "\n";
+    public String toFileStr(String name){
+        return name + "|" + username + "|" + userReviewsNo + "|" + rating + "|" + title + "|" + review + "|" + date + "|" + visitedIn + "|" + likes + "\n";
     }
 
 }

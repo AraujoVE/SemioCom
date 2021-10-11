@@ -2,6 +2,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 public class CustomFileHandler {
@@ -19,8 +22,19 @@ public class CustomFileHandler {
         }
     }
 
-    public void writeFile(String path,String content){
+    public void clearFile(String path){
         File file = new File(path);
+        if (file.exists()){
+            file.delete();
+        }
+    }
+
+
+    public int writeFile(String path,String content){
+        System.out.println("Creating file: " + path);
+        File file = new File(path);
+        Path pathTest = Paths.get(path);
+        if(Files.exists(pathTest)) return 2;
         try {
             file.createNewFile();
             FileWriter fw = new FileWriter(file.getAbsoluteFile());
@@ -28,9 +42,13 @@ public class CustomFileHandler {
             bw.write(content);
             bw.close();
         } catch (IOException e) {
+            System.out.println("Error while creating file:\n\n\n\n\n\n\n\n" + path);
             e.printStackTrace();
-        }
+            return 0;
+        }   
+        return 1;
     }
+
 
     public void createFile(String path){
         File file = new File(path);

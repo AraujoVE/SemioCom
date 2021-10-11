@@ -15,6 +15,10 @@ public class XPathUtils {
         this.driver = driver;
     }
 
+    public void goToPage(String page){
+        driver.get(page);
+    }
+
     public void type(String xpath, String text) {
         // Selenium type
         WebElement element = elem(xpath);

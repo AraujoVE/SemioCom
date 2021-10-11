@@ -91,6 +91,15 @@ public class TweetsIds {
         int tweetsLen = tweets.size(); //Getting the length of the tweets list
         System.out.println("TweetsLen: " + tweetsLen); //Printing the length of the tweets list
 
+        //Remover dps de mostrar
+        if(tweetsLen > 0){
+            for(int j = 0;j<tweetsLen;j++){
+                System.out.println(tweets.get(j).toString()); //Printing the tweets
+            }
+            xp.sleepS(100000);
+        }
+        //Remover dps de mostrar^
+
         if(tweetsLen >= MAX_TWEETS) writeTweets(); //If the tweetsLen reached a maximum value, the tweets are written in a file
 
         //We than try to go to the last 'time' element to scroll the page
