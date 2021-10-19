@@ -216,7 +216,6 @@ public class Restaurant {
         }
         catch(Exception e){
             System.out.println("url >>"+restaurantDoc.location());
-            fh.writeFile("/home/vinicius/htmll.txt",restaurantDoc.html());
         }
         address = restaurantDoc.select("[href=\"#MAPVIEW\"]").first().text();
         try{
@@ -291,7 +290,6 @@ public class Restaurant {
                 }
                 catch(Exception e1){
                     try{
-                        fh.writeFile("../arrumando.txt",reviewDoc.html());
                         System.out.println("Deu ruim 2");
                         userReviewsNo = Integer.parseInt(reviewDoc.select("span.badgeText").first().text().trim().split(" ")[0].replace(".", ""));
                         likes = -1;

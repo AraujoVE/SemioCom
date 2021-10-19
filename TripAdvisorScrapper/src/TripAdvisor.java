@@ -38,7 +38,10 @@ public class TripAdvisor {
     private boolean setRestaurantVars(Document restaurantDoc,int iter){
         Element mainParams = restaurantDoc.select("a.bHGqj.Cj.b").first();//Get the element that has important parameters
         
-        String name = mainParams.attr("href").split("Reviews-")[1].split("-"+normalizedCity)[0].trim();//Get the name of the restaurant
+        String restHref = mainParams.attr("href");
+        String partialName = restHref.split("-Reviews-")[1].split("-"+normalizedCity)[0].trim();
+        String restId = restHref.split("-Reviews-")[0].split("d")[1].trim();
+        String name = partialName + "#" + restId;
         //if name in writtenRestaurants, break
         if(writtenRestaurants.contains(name)){
             System.out.println("\tRestaurant already written = "+name);
@@ -184,7 +187,7 @@ public class TripAdvisor {
         iter = TERMINAL_NUMBER;//Set the number of restaurants per page
         this.parallelProgs = parallelProgs;//Set the number of parallel programs
         normalizedCity = normalizedCityName(city);//Set the normalized city in the class
-        filePath = "/home/vinicius/gits/SemioCom/TripAdvisorScrapper/TripAdvisorData/" + normalizedCity;
+        filePath = "./TripAdvisorData/" + normalizedCity;
         fh = new CustomFileHandler();//Initializing the FileHandler
         fh.createDirectories(filePath);//Creating search directory
         String pathh = filePath + "/" + "restaurantsList_" + String.valueOf(TERMINAL_NUMBER)+"_"+ String.valueOf(parallelProgs) +".csv";

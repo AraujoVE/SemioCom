@@ -24,8 +24,6 @@ def filterRestaurants(restaurantsPath,savePath,sep='|',subSep=';',name=None,url=
     df = filterNumberRangeList(df,ruim,13)
     df = filterNumberRangeList(df,horrivel,14)
 
-    print(df)
-
     df.to_csv(savePath,sep=sep,index=False)
 
     return [[i] for i in df.iloc[:,0].tolist()]
@@ -68,4 +66,4 @@ savePathRev = "./reviewsLog.csv"
 
 joinFiles(basePath,filePathBase,iters,extension,max)
 chosenRests = filterRestaurants(restaurantsPath,savePathRest,returnNone=True)
-filterReviews(basePath[:-1],savePathRev,restaurant=chosenRests,text=[[".*Mais$"]])
+filterReviews(basePath[:-1],savePathRev,restaurant=chosenRests,score=["1,2"])
