@@ -1,0 +1,8 @@
+A primeira linha contem o texto de busca.
+since_time e until_time possuem uma formatação diferente da utilizada no advenced search no "searchText.txt". A formatação utilizada no arquivo ".txt" é:
+    yyyy-MM-ddThh:mm:ss
+    ex.: 2021-12-31T23:59:58
+    31 de dezembro de 2021 às 23 horas, 59 minutos e 58 segundos. Obs.: O 'T' deve estar presente em todos os horários
+Na segunda linha temos a Timezone com o padrão que pode ser encontrado nesse site: https://code2care.org/pages/java-timezone-list-utc-gmt-offset
+no caso do horário de Brasília, isso seria: 
+    Brazil/East

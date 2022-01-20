@@ -21,6 +21,10 @@ public class TweetParams {
     public String getId() {
         return id;
     }
+    public String getIdValue(){
+        String[] splitted = id.split("/");
+        return splitted[splitted.length-1];
+    }
     public void setId(String id) {
         this.id = id;
     }
@@ -69,6 +73,6 @@ public class TweetParams {
 
 
     public String toString() {
-        return id + "," + at  + "," + date + "," + likes + "," + retweets + "," + replies + "," + text.trim().replaceAll("\\s+", "_").replace("_", " ");
+        return id + "|" + at  + "|" + date + "|" + likes + "|" + retweets + "|" + replies + "|" + text.trim().replace("|"," ").replaceAll("\\s+", "_").replace("_", " ");
     }
 }

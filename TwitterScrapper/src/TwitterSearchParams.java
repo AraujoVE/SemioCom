@@ -1,31 +1,41 @@
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.regex.Pattern;
 
 public class TwitterSearchParams {
-    private String[] texts;
-    private String since;
-    private String until;    
-    private String lang;
+    private String searchText;
+    private String originalEncodedStr;
     private String encodedStr;
-    public TwitterSearchParams(String[] texts, String since, String until, String lang) {
-        this.texts = texts;
-        this.since = since;
-        this.until = until;
-        this.lang = lang;
+    CustomFileHandler fh = new CustomFileHandler();
+
+    public TwitterSearchParams(String path) {
+        setSearchText(path);
+        encodedStr = searchText;
         encodeString();
+        originalEncodedStr = encodedStr;
     }
     public TwitterSearchParams(){}
-    public String[] getTexts() {
-        return texts;
+
+    private String dateToSec(String dateText,String timeZone){
+        LocalDateTime ldt = LocalDateTime.parse(dateText);
+        ZoneId z = ZoneId.of(timeZone);
+        ZonedDateTime zdt = ldt.atZone( z ) ; 
+        Instant instant = zdt.toInstant();
+        long epochSecond = instant.getEpochSecond();
+        return String.valueOf(epochSecond);
     }
-    public String getSince() {
-        return since;
-    }
-    public String getUntil() {
-        return until;
-    }
-    public String getLang() {
-        return lang;
+
+    private void setSearchText(String path) {
+        System.out.println("Reading search text from file: " + path);
+        List<String> fileLines = fh.readFileLines(path);
+        String searchText = Pattern.compile("(?<=(since|until)_time:)(.+?)(?=$| )").matcher(fileLines.get(0)).replaceAll(x -> dateToSec(x.group(),fileLines.get(1)));
+        
+        this.searchText = searchText;
     }
     public String encode(String s) {
         String encodedStr = "";
@@ -41,7 +51,6 @@ public class TwitterSearchParams {
         return encodedStr;
     }
     private void encodeString() {
-        encodedStr = String.join(" ", texts) + " since:" + since + " until:" + until + " lang:" + lang;
         try {
             encodedStr = URLEncoder.encode(encodedStr, "UTF-8");
             encodedStr = encodedStr.replaceAll("\\+", "%20");
@@ -54,6 +63,15 @@ public class TwitterSearchParams {
     }
     public String getEncodedStr() {
         return encodedStr;
+    }
+
+    public String getOriginalEncodedStr() {
+        return encodedStr;
+    }
+
+    public void setEncodeIdString(String url){
+        encodedStr = searchText.replaceAll("since_time:.+?(?=$| )", "max_id:" + url);
+        encodeString();
     }
 
     public String getTwitterURL(){

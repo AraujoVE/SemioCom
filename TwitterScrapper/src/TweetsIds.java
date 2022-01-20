@@ -14,18 +14,20 @@ public class TweetsIds {
     private WebDriver driver;
     private TwitterSearchParams keyword;
     private XPathUtils xp;
-    private int lastIdFirst9Digits = 1000000000;
-    private int MAX_TWEETS = 1000;
+    private long lastIdDigits = Long.MAX_VALUE;
+    private int MAX_TWEETS = 100;
     private int lastTweetIdCount = 0;
     private int MAX_NO_NEW_TWEETS = 1000;
     private int noNewTweets = 0;
     private CustomFileHandler fh;
     private List<TweetParams> tweets = new ArrayList<>();
+    private String lastTweetId;
 
 
     private void writeTweets(){
         //Structuring tweet path
-        String path = "./TwitterData/" + keyword.getEncodedStr() +  "/" + Integer.toString(lastTweetIdCount) + "-" + Integer.toString(lastTweetIdCount+tweets.size())  + ".csv";
+        System.out.println("Tweet Count"+ tweets.size());
+        String path = "./TwitterData/" + keyword.getOriginalEncodedStr() +  "/" + Integer.toString(lastTweetIdCount) + "-" + Integer.toString(lastTweetIdCount+tweets.size())  + ".csv";
         //Joining content texts
         String content = "";
         for(TweetParams tp : tweets){
@@ -36,6 +38,7 @@ public class TweetsIds {
         //Updating tweet count
         lastTweetIdCount += tweets.size() + 1;
         //Clearing tweets
+        lastTweetId = tweets.get(tweets.size()-1).getIdValue();
         tweets.clear();
 
     }
@@ -61,43 +64,47 @@ public class TweetsIds {
 
     private void retrieveIds() {
         List<WebElement> elems = xp.elemsWT("//time"); // To, in the end, find the element to move on (time.size()-1)
-        int nextLastId = 0;
+        //System.out.println("elems.size(): " + elems.size());
+        long nextLastId = 0;
         Document doc;
         doc = Jsoup.parse(xp.attr("/html","innerHTML")); //Get the page html
         List<Document> articleDocs = new ArrayList<>(); //List of articles as docs
         for(Element a : doc.select("article")) articleDocs.add(Jsoup.parse(a.toString())); //Iterate through articles and add to list fo docs
-        int integerId;//Current tweet id
+        long integerId;//Current tweet id
 
         for(int i = articleDocs.size() - 1; i>=0 ;i--){ //Iterate through articles in reverse order
             
             Element timeElem = articleDocs.get(i).select("time").first();//get time element
             String curId = timeElem.parent().attr("href");//get the id by getting the href attribute of the time element parent
-            integerId = Integer.parseInt((curId.split("/")[curId.split("/").length - 1].substring(0,9))); //get the id by parsing the last 9 digits of the id last splited by '/' part
+            integerId = Long.parseLong((curId.split("/")[curId.split("/").length - 1])); //get the id by parsing the digits of the id last splited by '/' part
             if(i == articleDocs.size()-1) nextLastId = integerId; //If we are on the last article, set the nextLastId to the current id
             
             //If the integerId is older - its id is smaller than the last id - we can add it to the list
-            if(integerId < lastIdFirst9Digits) setTweetParams(articleDocs.get(i), timeElem, curId);
+            if(integerId < lastIdDigits) setTweetParams(articleDocs.get(i), timeElem, curId);
             else break; //Else, we can stop iterating
         }
 
-        if(nextLastId < lastIdFirst9Digits){ //If we had a older tweet id found, we can update the last id
-            lastIdFirst9Digits = nextLastId; //Updating the last id
+        if(nextLastId < lastIdDigits){ //If we had a older tweet id found, we can update the last id
+            lastIdDigits = nextLastId; //Updating the last id
             noNewTweets = 0; //Resetting the noNewTweets counter
         }
         else{//Else, we increase the noNewTweets counter and wait for some time
             noNewTweets++;
+            System.out.println("No new tweets: " + noNewTweets);
             xp.sleepS(0.06);
         }
         int tweetsLen = tweets.size(); //Getting the length of the tweets list
-        System.out.println("TweetsLen: " + tweetsLen); //Printing the length of the tweets list
+        System.out.println("\t\tTweetsLen: " + tweetsLen); //Printing the length of the tweets list
 
         //Remover dps de mostrar
+        /*
         if(tweetsLen > 0){
             for(int j = 0;j<tweetsLen;j++){
                 System.out.println(tweets.get(j).toString()); //Printing the tweets
             }
             xp.sleepS(100000);
         }
+        */
         //Remover dps de mostrar^
 
         if(tweetsLen >= MAX_TWEETS) writeTweets(); //If the tweetsLen reached a maximum value, the tweets are written in a file
@@ -111,8 +118,24 @@ public class TweetsIds {
         return;
     }
 
-    private void getTweetIds() {
+    private boolean getTweetIds() {
         boolean continueLoop = true;
+        boolean endRetrieve = true;
+        System.out.println("\tGetting tweet ids...");
+
+        //Checking if there are available tweets
+        try{
+            xp.elem("//div[contains(.,'Não há resultados para os termos que você digitou.')]");
+        }
+        catch(Exception e){
+            endRetrieve = false;
+        }
+        //If there are no available tweets, we break
+        if (endRetrieve) {
+            System.out.println("End of retrieve");
+            return false;
+        }                
+        
         //Waiting until the last element is not reachble anymore
         while(continueLoop){
             try{
@@ -124,19 +147,22 @@ public class TweetsIds {
         }
 
         boolean continueScrolling = true;
-        //While until there are no more tweets to get
+        //While happens until there are no more tweets to get
         while(continueScrolling){
             try{
                 //Try to click the button to try again
                 xp.click("//div[@role='button' and contains(.,'Tentar novamente')]");
             }
             catch(Exception e){
+                //System.out.println("'Tentar novamente' button not found");
                 //If not possible, retrieve existent tweets
                 retrieveIds();
             }
             // If there are no new tweets for MAX_NO_NEW_TWEETS consectutive times, stop scrolling
             if(noNewTweets >= MAX_NO_NEW_TWEETS) continueScrolling = false;
         }
+        if(tweets.size() > 0) writeTweets(); //If there are tweets, write them
+        return true;
     }
 
 
@@ -145,7 +171,20 @@ public class TweetsIds {
         ((JavascriptExecutor) driver).executeScript("document.body.style.zoom = '"+String.valueOf(reductTimes/100)+"'"); //Changing zoom to specified value      
     }
 
+
     private void manageWindow(String ... strOptions) {
+        String osName = System.getProperty("os.name");
+        if(osName.contains("Windows")){
+            System.setProperty("webdriver.chrome.driver", "ChromeDriver/chromedriver.exe");
+        }
+        else if(osName.contains("Linux")){
+            System.setProperty("webdriver.chrome.driver", "ChromeDriver/chromedriver");
+        }
+        else{
+            System.out.println("OS not supported");
+            //System.setProperty("webdriver.chrome.driver", "ChromeDriver/chromedriver.dmg");
+        }
+
         ChromeOptions options = new ChromeOptions();//Creating Chrome driver options
         for(String option : strOptions) options.addArguments(option);//Adding options to the driver
         driver = new ChromeDriver(options);//Creating Chrome driver with given options
@@ -157,12 +196,37 @@ public class TweetsIds {
     private void initialSettings(TwitterSearchParams keyword){
         this.keyword = keyword;//Set the keyword in the class
         fh = new CustomFileHandler();//Initializing the FileHandler
-        fh.createDirectories("./TwitterData/"+keyword.getEncodedStr());//Creating search directory
+        fh.createDirectories("./TwitterData/"+keyword.getOriginalEncodedStr());//Creating search directory
     }
 
     public TweetsIds(TwitterSearchParams keyword) {
-        initialSettings(keyword);//Initializing the class first params
-        manageWindow("--start-maximized");//Managing selenium driver
-        getTweetIds(); //Getting tweet ids
+        boolean firstIteration = true;
+        boolean continueOuterLoop = true;
+        while (continueOuterLoop) {
+            try{
+                System.out.println("Starting new page iteration");
+                initialSettings(keyword);//Initializing the class first params
+                manageWindow("--start-maximized");//Managing selenium driver
+            
+                boolean continueLoop = true;
+                if(firstIteration){
+                    System.out.println("First iteration no stops");
+                    firstIteration = false;
+                    continueLoop = getTweetIds(); //Getting tweet ids
+                }
+                while(continueLoop){
+                    System.out.println("Stop Iteration");
+                    keyword.setEncodeIdString(lastTweetId);//Updating the encoded id string
+                    driver.get(keyword.getTwitterURL());//Go to choosen page
+                    continueLoop = getTweetIds(); //Getting tweet ids
+                }
+                continueOuterLoop= false;
+            }
+            catch(Exception e){
+                System.out.println("Error: " + e.getMessage());
+                if(tweets.size() > 0) writeTweets(); //If there are tweets, write them
+                driver.quit(); //Quit the driver
+            }
+        }
     }
 }

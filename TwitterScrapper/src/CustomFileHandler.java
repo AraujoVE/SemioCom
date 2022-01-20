@@ -49,6 +49,7 @@ public class CustomFileHandler {
     }
 
     public List<String> readFileLines(String path){
+        System.out.println("Reading file3: " + path);
         List<String> lines = new java.util.ArrayList<String>();
         try {
             java.util.Scanner s = new java.util.Scanner(new File(path));
