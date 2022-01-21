@@ -66,11 +66,11 @@ public class TwitterSearchParams {
     }
 
     public String getOriginalEncodedStr() {
-        return encodedStr;
+        return originalEncodedStr;
     }
 
     public void setEncodeIdString(String url){
-        encodedStr = searchText.replaceAll("since_time:.+?(?=$| )", "max_id:" + url);
+        encodedStr = searchText.replaceAll("until_time:.+?(?=$| )", "max_id:" + url);
         encodeString();
     }
 

@@ -15,13 +15,12 @@ public class TweetsIds {
     private TwitterSearchParams keyword;
     private XPathUtils xp;
     private long lastIdDigits = Long.MAX_VALUE;
-    private int MAX_TWEETS = 100;
+    private int MAX_TWEETS_PER_FILE = 100;
     private int lastTweetIdCount = 0;
-    private int MAX_NO_NEW_TWEETS = 1000;
+    private int MAX_NO_NEW_TWEETS = 100;
     private int noNewTweets = 0;
     private CustomFileHandler fh;
     private List<TweetParams> tweets = new ArrayList<>();
-    private String lastTweetId;
 
 
     private void writeTweets(){
@@ -38,7 +37,6 @@ public class TweetsIds {
         //Updating tweet count
         lastTweetIdCount += tweets.size() + 1;
         //Clearing tweets
-        lastTweetId = tweets.get(tweets.size()-1).getIdValue();
         tweets.clear();
 
     }
@@ -107,7 +105,7 @@ public class TweetsIds {
         */
         //Remover dps de mostrar^
 
-        if(tweetsLen >= MAX_TWEETS) writeTweets(); //If the tweetsLen reached a maximum value, the tweets are written in a file
+        if(tweetsLen >= MAX_TWEETS_PER_FILE) writeTweets(); //If the tweetsLen reached a maximum value, the tweets are written in a file
 
         //We than try to go to the last 'time' element to scroll the page
         try{
@@ -120,21 +118,11 @@ public class TweetsIds {
 
     private boolean getTweetIds() {
         boolean continueLoop = true;
+        boolean continueScrolling = true;
         boolean endRetrieve = true;
         System.out.println("\tGetting tweet ids...");
 
-        //Checking if there are available tweets
-        try{
-            xp.elem("//div[contains(.,'Não há resultados para os termos que você digitou.')]");
-        }
-        catch(Exception e){
-            endRetrieve = false;
-        }
-        //If there are no available tweets, we break
-        if (endRetrieve) {
-            System.out.println("End of retrieve");
-            return false;
-        }                
+        xp.elemWT("//div");
         
         //Waiting until the last element is not reachble anymore
         while(continueLoop){
@@ -146,7 +134,22 @@ public class TweetsIds {
             }
         }
 
-        boolean continueScrolling = true;
+        xp.sleepS(6);
+
+        try{
+            System.out.println("\t\tChecking if there are available tweets...");
+            xp.elem("//div[contains(.,'Não há resultados para os termos que você digitou.')]");
+        }
+        catch(Exception e){
+            System.out.println("\t\tThere are available tweets");
+            endRetrieve = false;
+        }
+        //If there are no available tweets, we break
+        if (endRetrieve){
+            System.out.println("End of retrieve");
+            return false;
+        }                
+
         //While happens until there are no more tweets to get
         while(continueScrolling){
             try{
@@ -207,7 +210,6 @@ public class TweetsIds {
                 System.out.println("Starting new page iteration");
                 initialSettings(keyword);//Initializing the class first params
                 manageWindow("--start-maximized");//Managing selenium driver
-            
                 boolean continueLoop = true;
                 if(firstIteration){
                     System.out.println("First iteration no stops");
@@ -216,15 +218,20 @@ public class TweetsIds {
                 }
                 while(continueLoop){
                     System.out.println("Stop Iteration");
-                    keyword.setEncodeIdString(lastTweetId);//Updating the encoded id string
+                    if(lastIdDigits != Long.MAX_VALUE){
+                        lastIdDigits--; //To not include the last tweet id
+                        keyword.setEncodeIdString(String.valueOf(lastIdDigits));//Updating the encoded id string
+                    }
                     driver.get(keyword.getTwitterURL());//Go to choosen page
                     continueLoop = getTweetIds(); //Getting tweet ids
                 }
-                continueOuterLoop= false;
+                continueOuterLoop = false;
             }
             catch(Exception e){
                 System.out.println("Error: " + e.getMessage());
                 if(tweets.size() > 0) writeTweets(); //If there are tweets, write them
+            }
+            finally{
                 driver.quit(); //Quit the driver
             }
         }
