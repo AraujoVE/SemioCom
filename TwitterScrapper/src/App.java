@@ -7,9 +7,3 @@ public class App {
         new TweetsIds(params);
     }
 }
-
-
-
-
-
-

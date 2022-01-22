@@ -19,6 +19,15 @@ public class CustomFileHandler {
         }
     }
 
+    public void deleteRecursive(File fileOrDirectory) {
+        if(fileOrDirectory.isDirectory()){
+            for (File child : fileOrDirectory.listFiles()){
+                deleteRecursive(child);
+            }
+        }
+        fileOrDirectory.delete();
+    }
+
     public void writeFile(String path,String content){
         File file = new File(path);
         try {

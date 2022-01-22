@@ -1,3 +1,4 @@
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -199,6 +200,8 @@ public class TweetsIds {
     private void initialSettings(TwitterSearchParams keyword){
         this.keyword = keyword;//Set the keyword in the class
         fh = new CustomFileHandler();//Initializing the FileHandler
+        //String path "./local" to File type
+        fh.deleteRecursive(new File("./TwitterData/"+keyword.getOriginalEncodedStr()));//Deleting the folder with the tweets
         fh.createDirectories("./TwitterData/"+keyword.getOriginalEncodedStr());//Creating search directory
     }
 
@@ -208,7 +211,7 @@ public class TweetsIds {
         while (continueOuterLoop) {
             try{
                 System.out.println("Starting new page iteration");
-                initialSettings(keyword);//Initializing the class first params
+                if(firstIteration) initialSettings(keyword);//Initializing the class first params
                 manageWindow("--start-maximized");//Managing selenium driver
                 boolean continueLoop = true;
                 if(firstIteration){
