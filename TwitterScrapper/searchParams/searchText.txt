@@ -1,2 +1,2 @@
-bolsonaro lang:pt since_time:2022-01-01T00:00:00 until_time:2022-01-01T00:05:00
+bolsonaro lang:pt since:2018-11-10T03:50:00 until:2018-11-10T03:59:59
 Brazil/East

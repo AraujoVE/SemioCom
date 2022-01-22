@@ -26,7 +26,7 @@ def getDecaminutesInYears(firstYear, lastYear):
                 for hour in range(24):
                     for decaminute in range(6):
                         baseDecaminute = f"{year}-{(month+1):02d}-{(day+1):02d}T{(hour+1):02d}:{decaminute}"
-                        decaminutes.append(f"since:{baseDecaminute}0:00 until:{baseDecaminute}9:59")
+                        decaminutes.append(f"since_time:{baseDecaminute}0:00 until_time:{baseDecaminute}9:59")
     return decaminutes
 
 
