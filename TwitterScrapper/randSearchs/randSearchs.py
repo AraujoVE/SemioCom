@@ -32,7 +32,7 @@ def getDecaminutesInYears(firstYear, lastYear):
 
 def getDecaminutes(firstYear, lastYear):
     decaminutes = getDecaminutesInYears(firstYear, lastYear)
-    noOfHours = 60
+    noOfHours = 72
     choosenDecaminutes = []
     for i in range(noOfHours*6):
         randomDecaminute = randint(0, len(decaminutes)-1)
@@ -42,8 +42,8 @@ def getDecaminutes(firstYear, lastYear):
     return choosenDecaminutes
 
 def writeDecaminutes(fileName, firstYear, lastYear, baseText):
-    with open(fileName, 'w') as f:
+    with open(fileName, 'a') as f:
         for decaminute in getDecaminutes(firstYear, lastYear):
             f.write(f"{baseText} {decaminute}\n")
 
-writeDecaminutes("randSearchs.txt", 2016, 2021,"bolsonaro lang:pt")
+writeDecaminutes("randSearchs.txt", 2016, 2021,"lula lang:pt")
