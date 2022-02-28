@@ -18,9 +18,14 @@ public class TweetsIds {
     private long lastIdDigits = Long.MAX_VALUE;
     private int MAX_TWEETS_PER_FILE = 100;
     private int lastTweetIdCount = 0;
-    private int MAX_NO_NEW_TWEETS = 100;
+    private int MAX_NO_NEW_TWEETS = 25;
+    private int MAX_RELOADS = 5;
+    private int MAX_CLICKS = 5;
+    private int reloads = 0;
     private int noNewTweets = 0;
     private CustomFileHandler fh;
+    private String IsReply;
+    private String hasMedia;
     private List<TweetParams> tweets = new ArrayList<>();
 
 
@@ -43,20 +48,25 @@ public class TweetsIds {
     }
 
 
-    private void setTweetParams(Document articleDoc,Element timeElem,String id){
-        List<String> tweetDatasStr = new ArrayList<>(); //TweetDatas will be used to get the tweet replies, retweets and likes texts as strings 
+    private void setTweetParams(Document articleDoc,Element timeElem,String url){
+        //List<String> tweetDatasStr = new ArrayList<>(); //TweetDatas will be used to get the tweet replies, retweets and likes texts as strings 
         TweetParams tp = new TweetParams(); //Initializing the tweet params
-        
-        tp.setId(id); //Setting the id
-        tp.setAt(id.split("/")[1]); //Setting the at of the tweet
-        tp.setText(articleDoc.select("div.css-901oao.r-18jsvk2.r-37j5jr.r-a023e6.r-16dba41.r-rjixqe.r-bcqeeo.r-bnwqim.r-qvutc0").first().text()); //Setting the text of the tweet
+        Document newArticleDoc = Jsoup.parse(articleDoc.toString().replaceAll("(<img.*?data-emoji-text=\")(.*?)(\".*?>)", "$2"));         
+        //System.out.println("WRITING\n\n");
+        //System.out.println(articleDoc.toString()+"\n\n\n=====================\n\n\n"+newArticleDoc.toString()+"\n\n\n=====================\n=====================\n\n\n");
+        //xp.sleepS(100);
+        tp.setUrl(url); //Setting the url
+        tp.setText(newArticleDoc.select("div.css-901oao.r-18jsvk2.r-37j5jr.r-a023e6.r-16dba41.r-rjixqe.r-bcqeeo.r-bnwqim.r-qvutc0").first().text()); //Setting the text of the tweet
+        /*
         Elements tweetDatas = articleDoc.select("div.css-1dbjc4n.r-xoduu5.r-1udh08x");//Getting tweet replies, likes and retweets
         for(int j=0;j<3;j++) tweetDatasStr.add(tweetDatas.get(j).text());//Loading the texts of each data type to the corresponding list
         tp.setReplies(tweetDatasStr.get(0).matches("[0-9]+") ? tweetDatasStr.get(0) : "0"); //Setting the replies
         tp.setRetweets(tweetDatasStr.get(1).matches("[0-9]+") ? tweetDatasStr.get(1) : "0"); //Setting the retweets
         tp.setLikes(tweetDatasStr.get(2).matches("[0-9]+") ? tweetDatasStr.get(2) : "0"); //Setting the likes
+        */
         tp.setDate(timeElem.attr("datetime")); //Setting the date
-
+        tp.setIsReply(IsReply); //Setting the mention
+        tp.setHasMedia(hasMedia); //Setting the hasMedia
         tweets.add(tp); //Adding the tweet params to the list of tweets
     }
 
@@ -70,20 +80,31 @@ public class TweetsIds {
         List<Document> articleDocs = new ArrayList<>(); //List of articles as docs
         for(Element a : doc.select("article")) articleDocs.add(Jsoup.parse(a.toString())); //Iterate through articles and add to list fo docs
         long integerId;//Current tweet id
+        System.out.println("\t\tretrievingIds");
+        boolean nextLastIdTaken = false;
 
         for(int i = articleDocs.size() - 1; i>=0 ;i--){ //Iterate through articles in reverse order
-            
-            Element timeElem = articleDocs.get(i).select("time").first();//get time element
-            String curId = timeElem.parent().attr("href");//get the id by getting the href attribute of the time element parent
-            integerId = Long.parseLong((curId.split("/")[curId.split("/").length - 1])); //get the id by parsing the digits of the id last splited by '/' part
-            if(i == articleDocs.size()-1) nextLastId = integerId; //If we are on the last article, set the nextLastId to the current id
-            
-            //If the integerId is older - its id is smaller than the last id - we can add it to the list
-            if(integerId < lastIdDigits) setTweetParams(articleDocs.get(i), timeElem, curId);
-            else break; //Else, we can stop iterating
+            Element timeElem;
+            String curId;
+            try{
+                timeElem = articleDocs.get(i).select("time").first();//get time element
+                curId = timeElem.parent().attr("href");//get the id by getting the href attribute of the time element parent
+                integerId = Long.parseLong((curId.split("/")[curId.split("/").length - 1])); //get the id by parsing the digits of the id last splited by '/' part
+                if(integerId == 0) continue;
+                if(!nextLastIdTaken){
+                    nextLastId = integerId; //If we are on the last article, set the nextLastId to the current id
+                    nextLastIdTaken = true;
+                }
+                //If the integerId is older - its id is smaller than the last id - we can add it to the list
+                if(integerId < lastIdDigits) setTweetParams(articleDocs.get(i), timeElem, curId);
+                else break; //Else, we can stop iterating
+            }
+            catch(Exception e){
+                continue;
+            }
         }
 
-        if(nextLastId < lastIdDigits){ //If we had a older tweet id found, we can update the last id
+        if(nextLastId < lastIdDigits && nextLastId != 0){ //If we had a older tweet id found, we can update the last id
             lastIdDigits = nextLastId; //Updating the last id
             noNewTweets = 0; //Resetting the noNewTweets counter
         }
@@ -121,6 +142,7 @@ public class TweetsIds {
         boolean continueLoop = true;
         boolean continueScrolling = true;
         boolean endRetrieve = true;
+        int buttonClicked = 0;
         System.out.println("\tGetting tweet ids...");
 
         xp.elemWT("//div");
@@ -135,7 +157,7 @@ public class TweetsIds {
             }
         }
 
-        xp.sleepS(6);
+        xp.sleepS(3);
 
         try{
             System.out.println("\t\tChecking if there are available tweets...");
@@ -153,6 +175,7 @@ public class TweetsIds {
 
         //While happens until there are no more tweets to get
         while(continueScrolling){
+            buttonClicked++;
             try{
                 //Try to click the button to try again
                 xp.click("//div[@role='button' and contains(.,'Tentar novamente')]");
@@ -161,7 +184,9 @@ public class TweetsIds {
                 //System.out.println("'Tentar novamente' button not found");
                 //If not possible, retrieve existent tweets
                 retrieveIds();
+                buttonClicked--;
             }
+            if(buttonClicked > MAX_CLICKS) return true; 
             // If there are no new tweets for MAX_NO_NEW_TWEETS consectutive times, stop scrolling
             if(noNewTweets >= MAX_NO_NEW_TWEETS) continueScrolling = false;
         }
@@ -194,6 +219,7 @@ public class TweetsIds {
         driver = new ChromeDriver(options);//Creating Chrome driver with given options
         driver.get(keyword.getTwitterURL());//Go to choosen page
         xp = new XPathUtils(driver);//Initializing xPathUtils helper
+        //xp.sleepS(3);
         reduceScreenZoom(50);//Reduce the screen zoom
     }
 
@@ -206,6 +232,9 @@ public class TweetsIds {
     }
 
     public TweetsIds(TwitterSearchParams keyword) {
+        hasMedia = keyword.getHasMedia();
+        IsReply = keyword.getIsReply();
+        
         boolean firstIteration = true;
         boolean continueOuterLoop = true;
         while (continueOuterLoop) {
@@ -221,6 +250,7 @@ public class TweetsIds {
                 }
                 while(continueLoop){
                     System.out.println("Stop Iteration");
+                    System.out.println("\tlastIdDigits: " + lastIdDigits);
                     if(lastIdDigits != Long.MAX_VALUE){
                         lastIdDigits--; //To not include the last tweet id
                         keyword.setEncodeIdString(String.valueOf(lastIdDigits));//Updating the encoded id string
@@ -233,9 +263,11 @@ public class TweetsIds {
             catch(Exception e){
                 System.out.println("Error: " + e.getMessage());
                 if(tweets.size() > 0) writeTweets(); //If there are tweets, write them
+                reloads++;
             }
             finally{
                 driver.quit(); //Quit the driver
+                if(reloads >= MAX_RELOADS) continueOuterLoop = false;
             }
         }
     }

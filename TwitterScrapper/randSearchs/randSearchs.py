@@ -1,5 +1,10 @@
 from email.mime import base
 from random import randint
+
+medias = {"True":"filter:media", "False":"-filter:media"}
+replies = {"True":"filter:replies","False":"-filter:replies"}
+
+
 def isLeapYear(year):
     if year % 4 == 0:
         if year % 100 == 0:
@@ -12,10 +17,12 @@ def isLeapYear(year):
     else:
         return False
 
-def getDecaminutesInYears(firstYear, lastYear):
+
+
+def getThirtyMinutessInYears(firstYear, lastYear):
     monthsSize = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
     years = [i for i in range(firstYear, lastYear+1)]
-    decaminutes = []
+    thirtyMinutess = []
     for year in years:
         if isLeapYear(year):
             monthsSize[1] = 29
@@ -24,26 +31,30 @@ def getDecaminutesInYears(firstYear, lastYear):
         for month in range(len(monthsSize)):
             for day in range(monthsSize[month]):
                 for hour in range(24):
-                    for decaminute in range(6):
-                        baseDecaminute = f"{year}-{(month+1):02d}-{(day+1):02d}T{(hour+1):02d}:{decaminute}"
-                        decaminutes.append(f"since_time:{baseDecaminute}0:00 until_time:{baseDecaminute}9:59")
-    return decaminutes
+                    for thirtyMinutes in range(2):
+                        initMins = f"{thirtyMinutes*3}0:00"
+                        endMins = f"{(thirtyMinutes*3)+2}9:59"
+                        baseThirtyMinutes = f"{year}-{(month+1):02d}-{(day+1):02d}T{(hour+1):02d}:"
+                        thirtyMinutess.append(f"since_time:{baseThirtyMinutes}{initMins} until_time:{baseThirtyMinutes}{endMins}")
+    return thirtyMinutess
 
 
-def getDecaminutes(firstYear, lastYear):
-    decaminutes = getDecaminutesInYears(firstYear, lastYear)
+def getThirtyMinutess(firstYear, lastYear):
+    thirtyMinutess = getThirtyMinutessInYears(firstYear, lastYear)
     noOfHours = 72
-    choosenDecaminutes = []
-    for i in range(noOfHours*6):
-        randomDecaminute = randint(0, len(decaminutes)-1)
-        choosenDecaminutes.append(decaminutes[randomDecaminute])
-        decaminutes.pop(randomDecaminute)
+    choosenThirtyMinutes = []
+    for i in range(noOfHours*2):
+        randomThirtyMinutes = randint(0, len(thirtyMinutess)-1)
+        choosenThirtyMinutes.append(thirtyMinutess[randomThirtyMinutes])
+        thirtyMinutess.pop(randomThirtyMinutes)
 
-    return choosenDecaminutes
+    return choosenThirtyMinutes
 
-def writeDecaminutes(fileName, firstYear, lastYear, baseText):
+def writeThirtyMinutes(fileName, firstYear, lastYear, baseText):
     with open(fileName, 'a') as f:
-        for decaminute in getDecaminutes(firstYear, lastYear):
-            f.write(f"{baseText} {decaminute}\n")
+        for thirtyMinutes in getThirtyMinutess(firstYear, lastYear):
+            for media in medias:
+                for reply in replies:
+                    f.write(f"{medias[media]} {replies[reply]} {baseText} lang:pt {thirtyMinutes}\n")
 
-writeDecaminutes("randSearchs.txt", 2016, 2021,"lula lang:pt")
+writeThirtyMinutes("randSearchs.txt", 2016, 2021,'bolsonaro')

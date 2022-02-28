@@ -9,6 +9,8 @@ import java.util.regex.Pattern;
 
 public class TwitterSearchParams {
     private String searchText;
+    private String isReply;
+    private String hasMedia;
     private String originalEncodedStr;
     private String encodedStr;
     CustomFileHandler fh = new CustomFileHandler();
@@ -34,7 +36,18 @@ public class TwitterSearchParams {
         System.out.println("Reading search text from file: " + path);
         List<String> fileLines = fh.readFileLines(path);
         String searchText = Pattern.compile("(?<=(since|until)_time:)(.+?)(?=$| )").matcher(fileLines.get(0)).replaceAll(x -> dateToSec(x.group(),fileLines.get(1)));
-        
+        if(fileLines.get(0).contains("-filter:media")){
+            this.hasMedia = "False";
+        }
+        else{
+            this.hasMedia = "True";
+        }
+        if(fileLines.get(0).contains("-filter:replies")){
+            this.isReply = "False";
+        }
+        else{
+            this.isReply = "True";
+        }
         this.searchText = searchText;
     }
     public String encode(String s) {
@@ -77,4 +90,13 @@ public class TwitterSearchParams {
     public String getTwitterURL(){
         return "https://twitter.com/search?q=" +  encodedStr  + "&src=typed_query&f=live";
     }
+
+    public String getIsReply(){
+        return isReply;
+    }
+    public String getHasMedia(){
+        return hasMedia;
+    }
+
+
 }

@@ -1,78 +1,78 @@
+import java.util.HashMap;
+
 public class TweetParams {
+    private String url;
+    private String user;
     private String id;
-    private String at;
     private String text;
     private String date;
-    private String likes;
-    private String retweets;
-    private String retweetsWithComments;
-    private String replies;
-    public TweetParams(){}
-    public TweetParams(String id, String at, String text, String date, String likes, String retweets, String retweetsWithComments, String replies) {
-        this.id = id;
-        this.at = at;
+    private String hasMedia;
+    private String isReply;
+    HashMap<String,String> dictWords = new HashMap<String,String>();
+    
+    public TweetParams(){
+        dictWords.put("<LINK>", "link");
+        dictWords.put("<MEDIA>", "media");
+    }
+    public TweetParams(String url, String text, String date, String hasMedia, String isReply) {
+        this();
+        this.url = url;
+        user = url.split("/")[1];
+        id = url.split("/")[3];
         this.text = text;
         this.date = date;
-        this.likes = likes;
-        this.retweets = retweets;
-        this.retweetsWithComments = retweetsWithComments;
-        this.replies = replies;
+        this.hasMedia = hasMedia;
+        this.isReply = isReply;
+    }
+    
+    public String getUrl() {
+        return url;
+    }
+    public String getUser() {
+        return user;
     }
     public String getId() {
         return id;
     }
-    public String getIdValue(){
-        String[] splitted = id.split("/");
-        return splitted[splitted.length-1];
+    public void setUrl(String url) {
+        this.url = "https://twitter.com" + url;
+        user = url.split("/")[1];
+        id = url.split("/")[3];
     }
-    public void setId(String id) {
-        this.id = id;
-    }
-    public String getAt() {
-        return at;
-    }
-    public void setAt(String at) {
-        this.at = at;
-    }
+    
     public String getText() {
         return text;
     }
     public void setText(String text) {
-        this.text = text;
+        String auxText = text.trim().replace("|"," ").replaceAll("\\s+", "|").replace("|", " ");
+        for(String replaceWord : dictWords.keySet()){
+            auxText = auxText.replace(replaceWord, dictWords.get(replaceWord));
+        }
+        this.text = auxText;
     }
+    
     public String getDate() {
         return date;
     }
     public void setDate(String date) {
         this.date = date;
     }
-    public String getLikes() {
-        return likes;
+
+    public String getIsReply() {
+        return isReply;
     }
-    public void setLikes(String likes) {
-        this.likes = likes;
-    }
-    public String getRetweets() {
-        return retweets;
-    }
-    public void setRetweets(String retweets) {
-        this.retweets = retweets;
-    }
-    public String getRetweetsWithComments() {
-        return retweetsWithComments;
-    }
-    public void setRetweetsWithComments(String retweetsWithComments) {
-        this.retweetsWithComments = retweetsWithComments;
-    }
-    public String getReplies() {
-        return replies;
-    }
-    public void setReplies(String replies) {
-        this.replies = replies;
+    public void setIsReply(String isReply) {
+        this.isReply = isReply;
     }
 
+    public String getHasMedia() {
+        return hasMedia;
+    }
+    public void setHasMedia(String hasMedia) {
+        this.hasMedia = hasMedia;
+    }
 
     public String toString() {
-        return id + "|" + at  + "|" + date + "|" + likes + "|" + retweets + "|" + replies + "|" + text.trim().replace("|"," ").replaceAll("\\s+", "_").replace("_", " ");
+        return url + "|" + user + "|" + id + "|" + date + "|" + text + "|" + hasMedia + "|" + isReply;
     }
 }
