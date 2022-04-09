@@ -38,3 +38,4 @@ for batch in predictionDataloader:
 print('    DONE.')
 
 clib.matthewsCoef(predictions,true_labels)
+print(clib.fullMatthewsCoef(predictions,true_labels))

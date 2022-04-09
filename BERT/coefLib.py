@@ -28,3 +28,18 @@ def matthewsCoef(predictions,trueLabels):
         matthews_set.append(matthews)
 
     plotData(matthews_set)
+
+#Get the MCC final score
+def fullMatthewsCoef(predictions,trueLabels):
+    #Concatenate the predictions
+    flat_predictions = np.concatenate(predictions, axis=0) #Combine the results across all batches. 
+
+    #Get the max value of the list
+    flat_predictions = np.argmax(flat_predictions, axis=1).flatten() #For each sample, pick the label (0 or 1) with the higher score.
+
+    #Concatenate de true labels
+    flat_true_labels = np.concatenate(trueLabels, axis=0) #Combine the correct labels for each batch into a single list.
+
+    #Return the matthews coef
+    return matthews_corrcoef(flat_true_labels, flat_predictions) #Calculate the MCC
+

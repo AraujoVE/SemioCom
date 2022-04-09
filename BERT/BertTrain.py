@@ -83,9 +83,15 @@ for epoch_i in range(0, epochs): #Execute for each epoch
         total_eval_accuracy, total_eval_loss = [0,0]
 
         #Evaluate data for one epoch
+        predictions, true_labels = [],[]
+
+        #Calculate eval loss and append prediction and true labels from each batch to future calculations
         for batch in validationDataloader:
-            total_eval_loss, total_eval_accuracy = tlib.valBatchIter(batch,device,model,total_eval_loss,total_eval_accuracy)
-            
+            total_eval_loss, predictions, true_labels = tlib.valBatchIter(batch,device,model,total_eval_loss,predictions,true_labels)#,total_eval_accuracy)
+
+        total_eval_accuracy = clib.fullMatthewsCoef(predictions,true_labels) 
+
+
         #Set training stats params (epoch,Training Loss,Valid. Loss,Valid. Accur.,Training Time,Validation Time)
         training_stats.append(tlib.valParams(total_eval_loss,total_eval_accuracy,validationDataloader,t0,epoch_i,avg_train_loss,training_time))
 

@@ -2,6 +2,7 @@ import time
 import datetime
 import torch
 import numpy as np
+import coefLib as clib
 
 
 #Function to calculate the accuracy of our predictions vs labels
@@ -89,7 +90,7 @@ def trainBatchIter(step,trainDataloader,t0,batch,device,model,optimizer,schedule
     return total_train_loss
 
 #Function to make a batch iteration validation
-def valBatchIter(batch,device,model,total_eval_loss,total_eval_accuracy):
+def valBatchIter(batch,device,model,total_eval_loss,predictions,trueValues):#,total_eval_accuracy):
     inputIds, inputMask, labels = tuple(t.to(device) for t in batch) # Unpack the batch (id,mask and labels)
 
     
@@ -106,9 +107,11 @@ def valBatchIter(batch,device,model,total_eval_loss,total_eval_accuracy):
     #Move logits and labels to CPU
     logits = logits.detach().cpu().numpy()
     label_ids = labels.to('cpu').numpy()
+    predictions.append(np.array(logits))
+    trueValues.append(np.array(label_ids))
 
-    total_eval_accuracy += flatAccuracy(logits, label_ids) #Calculate the accuracy for this batch of test sentences, and accumulate it over all batches.
-    return total_eval_loss,total_eval_accuracy
+    #total_eval_accuracy += flatAccuracy(logits, label_ids) #Calculate the accuracy for this batch of test sentences, and accumulate it over all batches.
+    return total_eval_loss, predictions, trueValues
 
 #Function to make a batch iteration prediction
 def predBatchIter(batch,device,model):
