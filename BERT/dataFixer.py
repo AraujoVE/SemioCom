@@ -61,6 +61,3 @@ df = pd.concat([dfAppreciative[:minAppreciativeLabel],dfNonAppreciative[:minAppr
 df = df.sample(frac=1).reset_index(drop=True)
 
 df.to_csv(outputPath,sep='|',index=False)
-
-#with open(outputPath,'w') as f:
-#    f.write('\n'.join(textLines))

@@ -15,6 +15,9 @@ import gpuLib as glib
 import trainingLib as tlib
 import savingPreTrainedLib as spLib
 
+applyValidation = True
+validationPercentage = 0.2 if applyValidation else 0.0
+
 #Defining tokenizer and model from BERTimbau
 tokenizer = AutoTokenizer.from_pretrained('neuralmind/bert-large-portuguese-cased')
 model = AutoModel.from_pretrained('neuralmind/bert-large-portuguese-cased')
@@ -26,7 +29,7 @@ newTokens = list(pd.read_csv("extraVocab.csv")["vocab"])
 tokenizer.add_tokens(newTokens)
 model.resize_token_embeddings(len(tokenizer))
 
-trainDataloader, validationDataloader = dlib.dataloaderGeneration("./baseDataFixed.csv",tokenizer,0.2,32) #Setting the DataLoaders
+trainDataloader, validationDataloader = dlib.dataloaderGeneration("./baseDataFixed.csv",tokenizer,validationPercentage,32) #Setting the DataLoaders
 
 model = BertForSequenceClassification.from_pretrained(
     "neuralmind/bert-large-portuguese-cased", #Use the 24-layer BERTimbau model, with a cased vocab.
@@ -66,24 +69,25 @@ for epoch_i in range(0, epochs): #Execute for each epoch
     for step, batch in enumerate(trainDataloader):
         tlib.trainBatchIter(step,trainDataloader,t0,batch,device,model,optimizer,scheduler,total_train_loss)
 
-    avg_train_loss = total_train_loss / len(trainDataloader) #Calculate the average loss over all of the batches.
-    
-    training_time = tlib.printTrainTime(avg_train_loss,t0) #Measure how long this epoch took.
+    if applyValidation: #When training for real, ther's no need to run validation
+        avg_train_loss = total_train_loss / len(trainDataloader) #Calculate the average loss over all of the batches.
         
-    print("\nRunning Validation...")
+        training_time = tlib.printTrainTime(avg_train_loss,t0) #Measure how long this epoch took.
+            
+        print("\nRunning Validation...")
 
-    t0 = time.time()
+        t0 = time.time()
 
-    model.eval() #Put the model in evaluation mode
+        model.eval() #Put the model in evaluation mode
 
-    total_eval_accuracy, total_eval_loss = [0,0]
+        total_eval_accuracy, total_eval_loss = [0,0]
 
-    #Evaluate data for one epoch
-    for batch in validationDataloader:
-        total_eval_loss, total_eval_accuracy = tlib.valBatchIter(batch,device,model,total_eval_loss,total_eval_accuracy)
-        
-    #Set training stats params (epoch,Training Loss,Valid. Loss,Valid. Accur.,Training Time,Validation Time)
-    training_stats.append(tlib.valParams(total_eval_loss,total_eval_accuracy,validationDataloader,t0,epoch_i,avg_train_loss,training_time))
+        #Evaluate data for one epoch
+        for batch in validationDataloader:
+            total_eval_loss, total_eval_accuracy = tlib.valBatchIter(batch,device,model,total_eval_loss,total_eval_accuracy)
+            
+        #Set training stats params (epoch,Training Loss,Valid. Loss,Valid. Accur.,Training Time,Validation Time)
+        training_stats.append(tlib.valParams(total_eval_loss,total_eval_accuracy,validationDataloader,t0,epoch_i,avg_train_loss,training_time))
 
 
 print("\nTraining complete!\nTotal training took {:} (h:mm:ss)".format(tlib.formatTime(time.time()-total_t0)))

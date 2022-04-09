@@ -86,11 +86,12 @@ def dataloaderGeneration(dataPath,tokenizer,valPercentage,batchSize):
     
     trainDataset = TensorDataset(trainValues, trainAttentionMasks, trainLabels)
     validationDataset = TensorDataset(validationValues, validationAttentionMasks, validationLabels)
-    
+             
     if valPercentage != 1.0: #If there isn't just validation, generate the train and validation Dataloaders
         trainingDataloader = trainDataloader(trainDataset,trainLabels,batchSize)
         validationDataloader = valDataloader(validationDataset, batchSize)
         return trainingDataloader, validationDataloader
+    
 
     predDataloader = valDataloader(validationDataset, batchSize) #Otherwise, generate just the prediction Dataloader
     return predDataloader
