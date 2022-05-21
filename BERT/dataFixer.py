@@ -13,9 +13,9 @@ def translatePatterns(text):
     
     df[4] = df[4].apply(lambda text : emoji.demojize(text)) #Convert emojis to text
 
-    extraVocab =  ["[{}]".format(emot) for emot in re.findall(r'(?<=:)(\S+?)(?=:)','\n'.join(list(df[4])))] + list(replaceDict.values()) #Save used emoji names + replaceDict values names
+    extraVocab =  [f"[{emot.upper()}]" for emot in re.findall(r'(?<=:)(\S+?)(?=:)','\n'.join(list(df[4])))] + list(replaceDict.values()) #Save used emoji names + replaceDict values names
 
-    df[4] = df[4].str.replace(r'(:)(\S+?)(:)', r'[\2]', regex=True) #Fix emoji names to a pattern
+    df[4] = df[4].str.replace(r'(:)(\S+?)(:)', lambda x : r'['+x.group(2).upper()+']', regex=True) #Fix emoji names to a pattern
 
     df[0] = df[df.columns[:]].apply(lambda x: '|'.join(x.dropna().astype(str)),axis=1) #Join columns
 
@@ -37,9 +37,8 @@ def fixAppreciation(text):
     return "|".join(splittedText)
 
 #Set paths
-inputPath = "./trainingDataOld.csv"
+inputPath = "./lulonaro_training.csv"
 outputPath = "./trainingData.csv"
-emoticonPath = "./emoticonDictionary.csv"
 
 #Generate heading
 heading = "link|user|id|date|sentence|response|appreciative".split("|")
@@ -52,12 +51,45 @@ random.shuffle(textLines)
 df = pd.DataFrame(textLines)[0].str.split('|',expand=True)
 df.rename(columns=headingCols,inplace=True)
 
-dfAppreciative = df.loc[df['appreciative'] == '1'].reset_index(drop=True)
-dfNonAppreciative = df.loc[df['appreciative'] == '0'].reset_index(drop=True)
+dfAppreciativeLula = df.loc[(df['appreciative'] == '1') & (~df['sentence'].str.contains("bolsonaro",case=False)) & (df['sentence'].str.contains("lula",case=False))].reset_index(drop=True)
+dfAppreciativeBolsonaro = df.loc[(df['appreciative'] == '1') & (df['sentence'].str.contains("bolsonaro",case=False)) & (~df['sentence'].str.contains("lula",case=False))].reset_index(drop=True)
+dfAppreciativeBoth = df.loc[(df['appreciative'] == '1') & (df['sentence'].str.contains("bolsonaro",case=False)) & (df['sentence'].str.contains("lula",case=False))].reset_index(drop=True)
 
-minAppreciativeLabel = int(min(len(dfAppreciative),len(dfNonAppreciative))*0.9)
+dfNonAppreciativeLula = df.loc[(df['appreciative'] == '0') & (~df['sentence'].str.contains("bolsonaro",case=False)) & (df['sentence'].str.contains("lula",case=False))].reset_index(drop=True)
+dfNonAppreciativeBolsonaro = df.loc[(df['appreciative'] == '0') & (df['sentence'].str.contains("bolsonaro",case=False)) & (~df['sentence'].str.contains("lula",case=False))].reset_index(drop=True)
+dfNonAppreciativeBoth = df.loc[(df['appreciative'] == '0') & (df['sentence'].str.contains("bolsonaro",case=False)) & (df['sentence'].str.contains("lula",case=False))].reset_index(drop=True)
 
-df = pd.concat([dfAppreciative[:minAppreciativeLabel],dfNonAppreciative[:minAppreciativeLabel]]).reset_index(drop=True)
+minAppreciativeLulaBolsonaro = int(min(
+    len(dfAppreciativeLula),
+    len(dfAppreciativeBolsonaro),
+    len(dfNonAppreciativeLula),
+    len(dfNonAppreciativeBolsonaro)
+)*0.9)
+
+minAppreciativeBoth = int(min(
+    len(dfAppreciativeBoth),
+    len(dfNonAppreciativeBoth)
+)*0.9)
+
+df = pd.concat([
+    dfAppreciativeLula[:minAppreciativeLulaBolsonaro],
+    dfNonAppreciativeLula[:minAppreciativeLulaBolsonaro],
+    dfAppreciativeBolsonaro[:minAppreciativeLulaBolsonaro],
+    dfNonAppreciativeBolsonaro[:minAppreciativeLulaBolsonaro],
+    dfAppreciativeBoth[:minAppreciativeBoth],
+    dfNonAppreciativeBoth[:minAppreciativeBoth]
+]).reset_index(drop=True)
 df = df.sample(frac=1).reset_index(drop=True)
+
+df["expandedLabel"] = 0
+df.loc[(df['appreciative'] == '1') & (~df['sentence'].str.contains("bolsonaro",case=False)) & (df['sentence'].str.contains("lula",case=False)),"expandedLabel"] = 0
+df.loc[(df['appreciative'] == '0') & (~df['sentence'].str.contains("bolsonaro",case=False)) & (df['sentence'].str.contains("lula",case=False)),"expandedLabel"] = 1
+df.loc[(df['appreciative'] == '1') & (df['sentence'].str.contains("bolsonaro",case=False)) & (~df['sentence'].str.contains("lula",case=False)),"expandedLabel"] = 2
+df.loc[(df['appreciative'] == '0') & (df['sentence'].str.contains("bolsonaro",case=False)) & (~df['sentence'].str.contains("lula",case=False)),"expandedLabel"] = 3
+df.loc[(df['appreciative'] == '1') & (df['sentence'].str.contains("bolsonaro",case=False)) & (df['sentence'].str.contains("lula",case=False)),"expandedLabel"] = 4
+df.loc[(df['appreciative'] == '0') & (df['sentence'].str.contains("bolsonaro",case=False)) & (df['sentence'].str.contains("lula",case=False)),"expandedLabel"] = 5
+
+
+
 
 df.to_csv(outputPath,sep='|',index=False)
