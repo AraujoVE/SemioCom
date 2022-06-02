@@ -16,7 +16,7 @@ def bertExecution(fixedArguments,trainableParams):
 
     #Getting variable params from trainableparams
     batchSize = int(trainableParams[-1])
-    learningRates = [float(el) for el in trainableParams[:-1] if int(el) != -1]
+    learningRates = [float(el)*(10**-5) for el in trainableParams[:-1] if int(el) != -1]
     epochs = len(learningRates) - 1
 
 

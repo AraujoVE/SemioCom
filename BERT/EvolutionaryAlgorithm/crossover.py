@@ -1,13 +1,16 @@
-from typing import Any, Callable, List, Type
+from typing import TYPE_CHECKING, Any, Callable, List, Type
 import numpy.typing as npt
 import numpy as np
 import random
 
+if TYPE_CHECKING:
+    from BERT.EvolutionaryAlgorithm.population import Population
+
 class Crossover:
 
     #Initialization
-    def __init__(self, population: Type) -> None:
-        self.popClass : Type = population #Getting parent class
+    def __init__(self, population: 'Population') -> None:
+        self.popClass : 'Population' = population #Getting parent class
         self.execFunc : Callable = getattr(self, self.popClass.crossoverFuncName) #Specific crossover operation (meanValue,randomValue,etc)
         self.arrayFunc : Callable = getattr(self, self.popClass.crossoverArrayFuncName) #General crossover func (masked,nonmasked,etc)
 
