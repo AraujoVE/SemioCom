@@ -4,14 +4,16 @@ from BertExecution import bertExecution
 from random import random
 import json
 
-def mockFitnessFunc(fixedParams,variableParams): return variableParams[0] / (sum(variableParams) + 1)
+from numpy import ma
+
+def mockFitnessFunc(fixedParams,variableParams): return variableParams[0] / (sum([el for el in variableParams[:-1] if el != -1]) + 1)
 
 evoAlgIter = EvoAlgIter(mockFitnessFunc,"./evoAlgParam.json") 
 #evoAlgIter = EvoAlgIter(bertExecution,"./evoAlgParam.json") 
 bestParams = evoAlgIter.run()
 
 batchSize = bestParams["params"][-1]
-learningRates = [el for el in bestParams["params"][:-1] if int(el) != -1]
+learningRates = [el for el in bestParams["params"][:-1] if not el is ma.masked]
 epochs = len(learningRates) - 1
 bestParamsObj = {
     "batchSize" : batchSize,

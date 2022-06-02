@@ -19,4 +19,5 @@ class Sorting:
         if bestFitIndex != 0:
             self.ea.globalVars.data["orderArray"][[0,bestFitIndex]] = self.ea.globalVars.data["orderArray"][[bestFitIndex,0]]
             self.ea.globalVars.data["fitnessArray"][[0,bestFitIndex]] = self.ea.globalVars.data["fitnessArray"][[bestFitIndex,0]]
+            for pop in self.ea.pops: pop.order()
 

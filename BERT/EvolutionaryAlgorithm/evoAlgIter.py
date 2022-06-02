@@ -75,13 +75,17 @@ class EvoAlgIter:
         for pop in self.pops: pop.initializePop()
 
         self.i : int = 0
+        print(f"offspring Size = {self.offspringSize}")
         while not self.stopConditionFunc.stop():
             self.fitnessFunc.fit()
             self.sortingFunc.sort()
             for i in range(self.offspringSize):
+                print(f"Iter = {i}")
                 self.selectionFunc.select()
                 for pop in self.pops: pop.crossover()
-
+            for pop in self.pops: 
+                print("offsprings:",end="\n\t")
+                print(pop.offsprings)
             self.preUpdatePopFunc.preUpdatePop()
             for pop in self.pops: pop.updatePop()
             
@@ -90,4 +94,6 @@ class EvoAlgIter:
             self.i += 1
         self.fitnessFunc.fit()
 
+        print("Return Value =",end="\n\t")
+        print(self.globalVars.data["bestIndividual"])
         return self.globalVars.data["bestIndividual"]

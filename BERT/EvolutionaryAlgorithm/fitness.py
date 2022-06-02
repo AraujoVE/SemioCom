@@ -13,7 +13,8 @@ class Fitness:
 
     #Base fitness call
     def fit(self) -> None:
-        self.fullPop : npt.NDArray = np.hstack(tuple([Pop.pop for Pop in self.ea.pops])) #Setting populations together
+        self.fullPop : npt.NDArray = np.ma.hstack(tuple([Pop.pop for Pop in self.ea.pops])) #Setting populations together
+        print(f"\n\nfpop1 =\n{self.fullPop}")
         self.fullPop = np.split(self.fullPop,len(self.fullPop)) #Splitting each individual
         self.ea.globalVars.setAttr("bestIndividual",self.execFunc()) #Setting the bestIndividual
 
@@ -31,4 +32,7 @@ class Fitness:
             "params" : list(self.fullPop[np.argmax(fitnessArray)][0]),
             "value" : np.amax(fitnessArray)
         }
+        for i in range(len(self.fullPop)):
+            print(f"Individual:\n{self.fullPop[i]}\n\tValue:{fitnessArray[i]}")
+        print(f"bestIndividual = {bestIndividual}")
         return bestIndividual

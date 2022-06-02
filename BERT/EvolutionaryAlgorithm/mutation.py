@@ -14,7 +14,10 @@ class Mutation:
         if not self.popClass.name in self.popClass.globalVars.data["allMutatedChromossomes"]: 
             return
         mutatedChromossomes : npt.NDArray = self.popClass.globalVars.data["allMutatedChromossomes"][self.popClass.name]
-        np.apply_along_axis(self.arrayFunc,1,self.popClass.pop[mutatedChromossomes])
+        if self.popClass.arrayType.startswith("masked"):
+            np.ma.apply_along_axis(self.arrayFunc,1,self.popClass.pop[mutatedChromossomes])
+        else:
+            np.apply_along_axis(self.arrayFunc,1,self.popClass.pop[mutatedChromossomes])
         
 
     def nonmasked_0(self,chromossome : npt.NDArray) -> npt.NDArray:

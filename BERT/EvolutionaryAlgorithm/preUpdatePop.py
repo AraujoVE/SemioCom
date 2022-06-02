@@ -25,3 +25,10 @@ class PreUpdatePop:
         standardList : npt.NDArray = np.arange(self.ea.popSize)
         np.random.shuffle(standardList[1:])
         self.ea.globalVars.setAttr("newOrder",standardList)
+
+        print("toKeepChromossomes",end="\n\t")
+        print(self.ea.globalVars.data["toKeepChromossomes"])
+        print("toAddOffsprings",end="\n\t")
+        print(self.ea.globalVars.data["toAddOffsprings"])
+        print("newOrder",end="\n\t")
+        print(self.ea.globalVars.data["newOrder"])

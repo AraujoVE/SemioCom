@@ -33,3 +33,5 @@ class PreMutation:
         for i in range(len(chosenIndexes)): allMutatedChromossomes[chosenMutations[i]].append(chosenIndexes[i])
         for mut in set(chosenMutations): allMutatedChromossomes[mut] = np.array(allMutatedChromossomes[mut])
         self.ea.globalVars.setAttr("allMutatedChromossomes",allMutatedChromossomes)
+        print("allMutatedChromossomes",end="\n\t")
+        print(allMutatedChromossomes)

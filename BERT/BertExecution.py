@@ -1,6 +1,7 @@
 from BertDataclass import BertData_Initial, BertData_Hyperparameters, BertData_Fixed, BertData_Variable
 from BertModel import BertModel
 import json
+from numpy import ma
 
 def bertExecution(fixedArguments,trainableParams):
     #Getting fixed arguments from dict param 'fixedArguments'
@@ -15,10 +16,10 @@ def bertExecution(fixedArguments,trainableParams):
     testMode = False #Test mode definition
 
     #Getting variable params from trainableparams
-    batchSize = int(trainableParams[-1])
-    learningRates = [float(el)*(10**-5) for el in trainableParams[:-1] if int(el) != -1]
-    epochs = len(learningRates) - 1
 
+    batchSize = int(trainableParams[-1])
+    learningRates = [float(el)*(10**-5) for el in trainableParams[:-1] if not el is ma.masked]
+    epochs = len(learningRates) - 1
 
     bertModelParams : BertData_Initial = BertData_Initial(
         testMode,

@@ -107,9 +107,9 @@
 
 
     "stopCondition" : {
-        "funcName" : "valueGreater",
+        "funcName" : "basicCount",
         "params" : {
-            "threshold" : 0.8
+            "maxIter" : 2
         }
     },
     
