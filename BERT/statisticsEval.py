@@ -84,18 +84,38 @@ for line in lines:
 
 
 
+appreciationDict = {
+    "AAI" : "Apreciativo_Apreciativo_Indefinido",
+    "AAN" : "Apreciativo_Apreciativo_NaoApreciativo",
+    "AII" : "Apreciativo_Indefinido_Indefinido",
+    "AIN" : "Apreciativo_Indefinido_NaoApreciativo",
+    "ANN" : "Apreciativo_NaoApreciativo_NaoApreciativo",
+    "II" : "Indefinido_Indefinido",
+    "IIN" : "Indefinido_Indefinido_NaoApreciativo",
+    "INN" : "Indefinido_NaoApreciativo_NaoApreciativo"
+}
+
+
 
 def printAnnotator(name,annotation):
     print(f"{name}:")
     print(f"\tTotal Evaluations:{annotation['Total']}")
+
     print(f"\tAppreciation:")
     print(f"\t\tTotal Appreciations:{annotation['Apreciativo']['Total']}")
-    print(f"\t\t'Correct':{annotation['Apreciativo']['Correct']}")
-    print(f"\t\t'Wrong':{annotation['Apreciativo']['Wrong']}")
+    print(f"\t\t\t'Correct':{annotation['Apreciativo']['Correct']}")
+    print(f"\t\t\t'Wrong':{annotation['Apreciativo']['Wrong']}")
+
+    print(f"\tNon Appreciation:")
+    print(f"\t\tTotal Non Appreciations:{annotation['Não_Apreciativo']['Total']}")
+    print(f"\t\t\t'Correct':{annotation['Não_Apreciativo']['Correct']}")
+    print(f"\t\t\t'Wrong':{annotation['Não_Apreciativo']['Wrong']}")
+
 
 def printAnnotatorDoubt(name,annotation):
     print(f"{name}:")
     print(f"\tTotal Evaluations:{annotation['Total']}")
+
     print(f"\tAppreciation:")
     print(f"\t\tTotal Appreciations: {annotation['Apreciativo']['Total']}")
     print(f"\t\t\tApreciativo/Apreciativo/Indefinido: {annotation['Apreciativo']['AAI']}")
@@ -107,6 +127,7 @@ def printAnnotatorDoubt(name,annotation):
     print(f"\t\t\tApreciativo/Não Apreciativo/Não Apreciativo: {annotation['Apreciativo']['ANN']}")
     print(f"\t\t\tIndefinido/Não Apreciativo/Não Apreciativo: {annotation['Apreciativo']['INN']}")
 
+    print(f"\tNon Appreciation:")
     print(f"\t\tTotal Non Appreciations: {annotation['Não_Apreciativo']['Total']}")
     print(f"\t\t\tApreciativo/Apreciativo/Indefinido: {annotation['Não_Apreciativo']['AAI']}")
     print(f"\t\t\tApreciativo/Indefinido/Não Apreciativo: {annotation['Não_Apreciativo']['AIN']}")
@@ -134,3 +155,9 @@ for annotator in annotators.keys():
 print("\n###Undefined Annotations###")
 for annotator in annotators_Doubt.keys():
     printAnnotatorDoubt(annotator,annotators_Doubt[annotator])
+
+for line in lines:
+    url, user, id, data, sentence, response, appreciation = line.split("|")
+    appreciators = appreciation.split(";")[1].split(",")
+    typeOfAppreciation = appreciationDict["".join(sorted([appreciator.split(":")[1][0] for appreciator in appreciators]))]
+    with open(f"inDoubt/{typeOfAppreciation}.txt","a") as f: f.write(f"{line}\n")

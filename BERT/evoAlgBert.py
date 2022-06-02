@@ -1,4 +1,5 @@
 from EvolutionaryAlgorithm.evoAlgIter import EvoAlgIter
+from BertExecution import bertExecution
 
 from random import random
 import json
@@ -6,15 +7,17 @@ import json
 def auxFunc(fixedParams,variableParams): return random()
 
 evoAlgIter = EvoAlgIter(auxFunc,"./evoAlgParam.json") 
+#evoAlgIter = EvoAlgIter(bertExecution,"./evoAlgParam.json") 
 bestParams = evoAlgIter.run()
 
-batchSize = bestParams[-1]
-learningRates = [el for el in bestParams[:-1] if int(el) != -1]
+batchSize = bestParams["params"][-1]
+learningRates = [el for el in bestParams["params"][:-1] if int(el) != -1]
 epochs = len(learningRates) - 1
 bestParamsObj = {
     "batchSize" : batchSize,
     "learningRates" : learningRates,
-    "epochs" : epochs
+    "epochs" : epochs,
+    "prediction" : bestParams["value"]
 }
 
 with open('bestParams.json', 'w') as outfile:

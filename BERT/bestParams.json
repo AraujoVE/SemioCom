@@ -1,1 +1,1 @@
-{"batchSize": 32.0, "learningRates": [5.0, 4.0, 6.0], "epochs": 2}
+{"batchSize": 64.0, "learningRates": [5.0, 3.0, 3.0], "epochs": 2, "prediction": 0.9960038506711726}

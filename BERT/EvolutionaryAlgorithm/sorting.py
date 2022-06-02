@@ -9,7 +9,7 @@ class Sorting:
         self.execFunc : Callable = getattr(self, self.ea.sortingFuncName)
 
     def sort(self) -> None:
-        self.ea.globalVars.setAttr("OrderArray",np.arange(self.ea.popSize))
+        self.ea.globalVars.setAttr("orderArray",np.arange(self.ea.popSize))
         self.execFunc()
 
     def bestFirst(self) -> None:

@@ -99,7 +99,7 @@ class BertModel():
     #Generate the learning rates 
     def learningRateGen(self) -> None:
         leaningRatesEpoch : List[float] = self.bertDataHyperparameters.learningRates #Basic learning rates
-        learningRates : npt.NDArray = np.linspace(leaningRatesEpoch[:-1],leaningRatesEpoch[1:],len(self.bertDataVariable.trainDataloader)+1)[:-1].transpos().flatten() #Filling learning rates in between
+        learningRates : npt.NDArray = np.linspace(leaningRatesEpoch[:-1],leaningRatesEpoch[1:],len(self.bertDataVariable.trainDataloader)+1)[:-1].transpose().flatten() #Filling learning rates in between
         self.bertDataVariable.learningRates = learningRates #Set the learning rates
 
 

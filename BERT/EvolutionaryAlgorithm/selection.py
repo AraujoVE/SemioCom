@@ -22,3 +22,4 @@ class Selection:
             candidates : npt.NDArray = rng.choice(self.ea.popSize, size=self.ea.selectionParams["popPerTournment"], replace=False) #Getting random indexes from a fitnessArray
             bestIndex : npt.NDArray = np.argmax(self.ea.globalVars.data["fitnessArray"][candidates]) #Getting 'candidates' index that has the best fitness
             self.ea.globalVars.data["parentalsIndex"].append(candidates[bestIndex]) #Getting best fitness index
+        self.ea.globalVars.data["parentalsIndex"] = np.array(self.ea.globalVars.data["parentalsIndex"])

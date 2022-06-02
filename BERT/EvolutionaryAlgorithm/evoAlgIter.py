@@ -4,6 +4,7 @@ from EvolutionaryAlgorithm.preUpdatePop import PreUpdatePop
 from EvolutionaryAlgorithm.population import Population
 from EvolutionaryAlgorithm.selection import Selection
 from EvolutionaryAlgorithm.sorting import Sorting
+from EvolutionaryAlgorithm.fitness import Fitness
 
 from EvolutionaryAlgorithm.globalVars import GlobalVars
 
@@ -19,8 +20,8 @@ import json
 
 class EvoAlgIter:
 
-    def __init__(self,fitnessFunc : Callable,paramsPath : str) -> None:
-        self.fitnessFunc = fitnessFunc
+    def __init__(self,calcFitnessFunc : Callable,paramsPath : str) -> None:
+        self.calcFitnessFunc = calcFitnessFunc
         self.globalVars : Type[GlobalVars] = GlobalVars()
 
         with open(paramsPath) as jfile: 
@@ -61,22 +62,21 @@ class EvoAlgIter:
         self.stopConditionFuncName : str = self.params["stopCondition"]["funcName"]
         self.stopConditionFunc : Type[StopCondition] = StopCondition(self)
 
+        self.fitnessParams : Dict[str,Any] = self.params["fitness"]["params"]
+        self.fitnessFuncName : str = self.params["fitness"]["funcName"]
+        self.fitnessFunc : Type[Fitness] = Fitness(self)
 
-    def run(self) -> None:
+
+
+    def run(self) -> Dict[str,Any]:
         return self.mainFunc()
 
-
-    def mainEAFunc(self) -> None:
+    def mainEAFunc(self) -> Dict[str,Any]:
         for pop in self.pops: pop.initializePop()
 
         self.i : int = 0
         while not self.stopConditionFunc.stop():
-            fullPop : npt.NDArray = np.hstack(tuple([Pop.pop for Pop in self.pops]))
-            fitnessArray : npt.NDArray = []
-            for individual in np.split(fullPop,len(fullPop)): fitnessArray.append(self.fitnessFunc(self.fixedArguments,list(individual[0])))
-            #print(fullPop)
-            self.globalVars.setAttr("fitnessArray",np.array(fitnessArray))
-            self.globalVars.setAttr("orderArray",np.arange(len(fitnessArray)))
+            self.fitnessFunc.fit()
             self.sortingFunc.sort()
             for i in range(self.offspringSize):
                 self.selectionFunc.select()
@@ -88,7 +88,6 @@ class EvoAlgIter:
             self.preMutationFunc.preMutate()
             for pop in self.pops: pop.mutate()
             self.i += 1
-        
-        bestIndIndex : int = np.argmax(self.globalVars.data["fitnessArray"])
+        self.fitnessFunc.fit()
 
-        return list(np.split(fullPop,len(fullPop))[bestIndIndex][0])
+        return self.globalVars.data["bestIndividual"]

@@ -1,5 +1,6 @@
 from BertDataclass import BertData_Initial, BertData_Hyperparameters, BertData_Fixed, BertData_Variable
 from BertModel import BertModel
+import json
 
 def bertExecution(fixedArguments,trainableParams):
     #Getting fixed arguments from dict param 'fixedArguments'
@@ -36,3 +37,10 @@ def bertExecution(fixedArguments,trainableParams):
     bertModel : BertModel = BertModel(bertModelParams)
     bertModel.setHyperparameters(bertHyperparams)
     bertModel.train()
+
+'''
+fixedParams = json.load(open("evoAlgParam.json"))["fitnessFunctionFixedArguments"]
+print(fixedParams)
+treinableParams = [5e-5, 4e-5, 3e-5, 2e-5, -1, 8]
+bertExecution(fixedParams,treinableParams)
+'''

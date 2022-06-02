@@ -75,6 +75,11 @@
         }
     },
 
+    "fitness" : {
+        "funcName" : "dontRecalcBest",
+        "params" : {}
+    },
+
     "sorting" : {
         "funcName" : "bestFirst",
         "params" : {}
@@ -102,9 +107,9 @@
 
 
     "stopCondition" : {
-        "funcName" : "basicCount",
+        "funcName" : "valueGreater",
         "params" : {
-            "maxIter" : 100
+            "threshold" : 0.8
         }
     },
     
@@ -113,8 +118,8 @@
         "validation" : 0.2,
         "modelPath" : "neuralmind/bert-base-portuguese-cased",
         "tokenizerPath" : "neuralmind/bert-base-portuguese-cased",
-        "inputDataPath" : "/content/drive/Shareddrives/SemioCom/Corpora/Lula_e_Bolsonaro_novo/Anotado/trainingData.csv",
-        "extraVocabPath" : "/content/drive/Shareddrives/SemioCom/Corpora/Lula_e_Bolsonaro_novo/Anotado/extraVocab.csv",
+        "inputDataPath" : "trainingData.csv",
+        "extraVocabPath" : "extraVocab.csv",
         "preTrainedModelPath" : "/content/drive/Shareddrives/SemioCom/Corpora/Lula_e_Bolsonaro_novo/Anotado/preTrainedModel",
         "outputDataPath" :  ""
     }

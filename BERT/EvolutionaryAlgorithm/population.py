@@ -45,7 +45,7 @@ class Population:
         self.pop = self.genPopFunc.genPop()
 
     def order(self) -> None:
-        self.pop = self.pop[self.globalVars.data["OrderArray"]]
+        self.pop = self.pop[self.globalVars.data["orderArray"]]
 
     
     def crossover(self) -> None:

@@ -14,3 +14,6 @@ class StopCondition:
 
     def basicCount(self):
         return self.ea.i >= self.ea.stopConditionParams["maxIter"]
+    
+    def valueGreater(self):
+        return False if not ("bestIndividual" in self.ea.globalVars.data) else self.ea.globalVars.data["bestIndividual"]["value"] > self.ea.stopConditionParams["threshold"]
