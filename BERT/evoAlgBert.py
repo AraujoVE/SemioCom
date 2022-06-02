@@ -4,9 +4,9 @@ from BertExecution import bertExecution
 from random import random
 import json
 
-def auxFunc(fixedParams,variableParams): return random()
+def mockFitnessFunc(fixedParams,variableParams): return variableParams[0] / (sum(variableParams) + 1)
 
-evoAlgIter = EvoAlgIter(auxFunc,"./evoAlgParam.json") 
+evoAlgIter = EvoAlgIter(mockFitnessFunc,"./evoAlgParam.json") 
 #evoAlgIter = EvoAlgIter(bertExecution,"./evoAlgParam.json") 
 bestParams = evoAlgIter.run()
 
